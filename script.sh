@@ -7,6 +7,9 @@ python test.py --task traffic_state_pred --model STGCN --dataset PEMS_BAY_0.5
 python test.py --task traffic_state_pred --model GWNET --dataset PEMS_BAY
 python test.py --task traffic_state_pred --model GWNET --dataset PEMS_BAY_0.5
 
+python test.py --task traffic_state_pred --model CCRNN --dataset PEMS_BAY
+python test.py --task traffic_state_pred --model CCRNN --dataset PEMS_BAY_0.5
+
 python test.py --task traffic_state_pred --model MTGNN --dataset PEMS_BAY
 python test.py --task traffic_state_pred --model MTGNN --dataset PEMS_BAY_0.5
 
@@ -30,3 +33,5 @@ python test.py --task traffic_state_pred --model HGCN --dataset PEMS_BAY_0.5
 
 python test.py --task traffic_state_pred --model STTN --dataset PEMS_BAY
 python test.py --task traffic_state_pred --model STTN --dataset PEMS_BAY_0.5
+
+
