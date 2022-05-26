@@ -1,5 +1,19 @@
 echo ------------------------------------
 echo ----------------------  
+echo ---------------- RNN PEMS_BAY
+echo ---------- 
+echo ----
+python run_model.py --task traffic_state_pred --model RNN --dataset PEMS_BAY
+
+echo ------------------------------------
+echo ----------------------  
+echo ---------------- RNN PEMS_BAY_0.5
+echo ---------- 
+echo ----
+python run_model.py --task traffic_state_pred --model RNN --dataset PEMS_BAY_0.5
+
+echo ------------------------------------
+echo ----------------------  
 echo ---------------- DCRNN PEMS_BAY
 echo ---------- 
 echo ----
