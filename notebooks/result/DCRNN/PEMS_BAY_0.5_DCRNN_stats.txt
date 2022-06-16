@@ -1,0 +1,8 @@
+   time_taken_mean  time_taken_max  time_taken_min  time_taken_std  val_loss_from  val_loss_to  train_loss_from  train_loss_to  max_epoch  num_epoch train_loss_min_index
+0      1163.610805          1516.3         1067.01       62.939792         2.3055        1.676           1.0147         0.8112        100         87                 [13]
+
+Total training time (hrs): 28.0 hours
+Total training time (sec): 101234.452 seconds
+Total training time (min): 1687.0 minutes
+Start training time: 2022-05-26 22:21:18,572
+Start training time: 2022-05-28 02:28:33,024
