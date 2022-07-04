@@ -12,6 +12,8 @@ from libcity.config import ConfigParser
 from libcity.data import get_dataset
 from libcity.utils import get_executor, get_model, get_logger, ensure_dir, set_random_seed
 
+# modified
+import psutil
 
 def run_model(task=None, model_name=None, dataset_name=None, config_file=None,
               saved_model=True, train=True, other_args=None):
@@ -26,6 +28,9 @@ def run_model(task=None, model_name=None, dataset_name=None, config_file=None,
         train(bool): whether to train the model
         other_args(dict): the rest parameter args, which will be pass to the Config
     """
+    # get process id
+    process = psutil.Process(os.getpid())
+
     # load config
     config = ConfigParser(task, model_name, dataset_name,
                           config_file, saved_model, train, other_args)
@@ -42,26 +47,48 @@ def run_model(task=None, model_name=None, dataset_name=None, config_file=None,
     # seed
     seed = config.get('seed', 0)
     set_random_seed(seed)
+    # memory begin
+    memory_start = process.memory_info().rss/1024/1024
+    logger.info('***** Memory start  : {}MB'.format(memory_start))
+    logger.info('***** Memory current: {}MB'.format(process.memory_info().rss/1024/1024))
     # 加载数据集
     dataset = get_dataset(config)
     # 转换数据，并划分数据集
     train_data, valid_data, test_data = dataset.get_data()
     data_feature = dataset.get_data_feature()
+    memory_dataset = (process.memory_info().rss/1024/1024) - memory_start
+    logger.info('***** Memory dataset: {}MB'.format(memory_dataset))
+    logger.info('***** Memory current: {}MB'.format(process.memory_info().rss/1024/1024))
     # 加载执行器
     model_cache_file = './libcity/cache/{}/model_cache/{}_{}.m'.format(
         exp_id, model_name, dataset_name)
     model = get_model(config, data_feature)
+    memory_model = (process.memory_info().rss/1024/1024) - memory_start - memory_dataset
+    logger.info('***** Memory model    : {}MB'.format(memory_model))
+    logger.info('***** Memory current  : {}MB'.format(process.memory_info().rss/1024/1024))
     executor = get_executor(config, model, data_feature)
     # 训练
     if train or not os.path.exists(model_cache_file):
         executor.train(train_data, valid_data)
+        memory_train = (process.memory_info().rss/1024/1024) - memory_start - memory_dataset - memory_model
+        logger.info('***** Memory after-train: {}MB'.format(memory_train))
+        logger.info('***** Memory current    : {}MB'.format(process.memory_info().rss/1024/1024))
         if saved_model:
             executor.save_model(model_cache_file)
     else:
         executor.load_model(model_cache_file)
     # 评估，评估结果将会放在 cache/evaluate_cache 下
     executor.evaluate(test_data)
+    memory_evaluation = (process.memory_info().rss/1024/1024) - memory_start - memory_dataset - memory_model - memory_train
+    logger.info('***** Memory after-evaluate: {}MB'.format(memory_evaluation))
+    logger.info('***** Memory current       : {}MB'.format(process.memory_info().rss/1024/1024))
 
+    logger.info('Memory Info:')
+    logger.info('Memory start   : {}MB'.format(memory_start))
+    logger.info('Memory dataset : {}MB'.format(memory_dataset))
+    logger.info('Memory model   : {}MB'.format(memory_model))
+    logger.info('Memory train   : {}MB'.format(memory_train))
+    logger.info('Memory evaluate: {}MB'.format(memory_evaluation))
 
 def parse_search_space(space_file):
     search_space = {}
